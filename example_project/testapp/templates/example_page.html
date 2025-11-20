@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ request.resolver_match.url_name }} | Example page</title>
+</head>
+<body>
+  <p>
+    <a href="{% url 'index' %}">Return to index</a>
+  </p>
+  {% block content %}{% endblock content %}
+  <p>View the terminal logs for output.</p>
+</body>
+</html>

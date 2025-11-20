@@ -1,0 +1,247 @@
+from __future__ import annotations
+
+from unittest.mock import MagicMock
+
+import pytest
+from django.core.cache.backends.db import DatabaseCache
+from django.core.cache.backends.dummy import DummyCache
+from django.core.cache.backends.filebased import FileBasedCache
+from django.core.cache.backends.locmem import LocMemCache
+from django.core.cache.backends.redis import RedisCache
+
+from django_observe.cache import observe_cache_operation
+from django_observe.config import get_config
+from django_observe.hacks.cache import WRAPPED_CACHE_METHODS, patch_cache
+
+
+@pytest.fixture(autouse=True)
+def enable_observing(settings):
+    """Enable observing for all tests."""
+    settings.OBSERVING = {"enabled": True}
+
+
+@pytest.fixture
+def mock_handler():
+    """Create a mock signal handler."""
+    return MagicMock()
+
+
+class TestWrappedCacheMethods:
+    """Test the WRAPPED_CACHE_METHODS list."""
+
+    def test_wrapped_cache_methods_is_list(self):
+        """Test that WRAPPED_CACHE_METHODS is a list."""
+        assert isinstance(WRAPPED_CACHE_METHODS, list)
+
+    def test_wrapped_cache_methods_contains_expected_methods(self):
+        """Test that WRAPPED_CACHE_METHODS contains expected cache methods."""
+        expected_methods = [
+            "add",
+            "get",
+            "set",
+            "get_or_set",
+            "touch",
+            "delete",
+            "clear",
+            "get_many",
+            "set_many",
+            "delete_many",
+            "has_key",
+            "incr",
+            "decr",
+            "incr_version",
+            "decr_version",
+        ]
+
+        for method in expected_methods:
+            assert method in WRAPPED_CACHE_METHODS
+
+
+class TestPatchCache:
+    """Test the patch_cache function."""
+
+    def test_patch_cache_wraps_locmem_cache(self):
+        """Test that patch_cache wraps LocMemCache methods."""
+        original_get = LocMemCache.get
+        original_set = LocMemCache.set
+
+        patch_cache()
+
+        assert LocMemCache.get is not original_get
+        assert LocMemCache.set is not original_set
+
+        assert callable(LocMemCache.get)
+        assert callable(LocMemCache.set)
+
+    def test_patch_cache_wraps_dummy_cache(self):
+        """Test that patch_cache wraps DummyCache methods."""
+        original_get = DummyCache.get
+
+        patch_cache()
+
+        assert DummyCache.get is not original_get
+        assert callable(DummyCache.get)
+
+    def test_patch_cache_wraps_database_cache(self):
+        """Test that patch_cache wraps DatabaseCache methods."""
+        original_get = DatabaseCache.get
+
+        patch_cache()
+
+        assert DatabaseCache.get is not original_get
+        assert callable(DatabaseCache.get)
+
+    def test_patch_cache_wraps_file_based_cache(self):
+        """Test that patch_cache wraps FileBasedCache methods."""
+        original_get = FileBasedCache.get
+
+        patch_cache()
+
+        assert FileBasedCache.get is not original_get
+        assert callable(FileBasedCache.get)
+
+    def test_patch_cache_wraps_redis_cache(self):
+        """Test that patch_cache wraps RedisCache methods."""
+        original_get = RedisCache.get
+
+        patch_cache()
+
+        assert RedisCache.get is not original_get
+        assert callable(RedisCache.get)
+
+    def test_patch_cache_wraps_all_specified_methods(self):
+        """Test that patch_cache wraps all methods in WRAPPED_CACHE_METHODS."""
+        original_methods = {
+            method: getattr(LocMemCache, method, None)
+            for method in WRAPPED_CACHE_METHODS
+        }
+
+        patch_cache()
+
+        for method in WRAPPED_CACHE_METHODS:
+            current_method = getattr(LocMemCache, method, None)
+            if current_method is not None:
+                assert current_method is not original_methods[method]
+
+    def test_patch_cache_wrapped_methods_are_callable(self):
+        """Test that wrapped methods are still callable."""
+        patch_cache()
+
+        for method_name in WRAPPED_CACHE_METHODS:
+            method = getattr(LocMemCache, method_name, None)
+            if method is not None:
+                assert callable(method)
+
+
+class TestPatchCacheFunctionality:
+    """Test that patched cache methods actually work."""
+
+    def test_patched_locmem_cache_get(self):
+        """Test that patched LocMemCache.get still works."""
+        patch_cache()
+
+        cache = LocMemCache("test", {"LOCATION": "test"})
+        cache.set("key", "value")
+
+        result = cache.get("key")
+        assert result == "value"
+
+    def test_patched_locmem_cache_set(self):
+        """Test that patched LocMemCache.set still works."""
+        patch_cache()
+
+        cache = LocMemCache("test", {"LOCATION": "test"})
+
+        cache.set("key", "value")
+        assert cache.get("key") == "value"
+
+    def test_patched_locmem_cache_delete(self):
+        """Test that patched LocMemCache.delete still works."""
+        patch_cache()
+
+        cache = LocMemCache("test", {"LOCATION": "test"})
+        cache.set("key", "value")
+
+        cache.delete("key")
+        assert cache.get("key") is None
+
+    def test_patched_dummy_cache_get(self):
+        """Test that patched DummyCache.get still works."""
+        patch_cache()
+
+        cache = DummyCache("test", {})
+
+        result = cache.get("key")
+        assert result is None
+
+    def test_patched_cache_triggers_signal(self, mock_handler):
+        """Test that patched cache methods trigger signals."""
+        get_config.cache_clear()
+
+        patch_cache()
+        observe_cache_operation.connect(mock_handler)
+
+        cache = LocMemCache("test", {"LOCATION": "test"})
+
+        cache.set("key", "value")
+
+        mock_handler.assert_called()
+        call_kwargs = mock_handler.call_args.kwargs
+        assert call_kwargs["function_name"] == "set"
+        assert call_kwargs["sender"] == LocMemCache
+
+        observe_cache_operation.disconnect(mock_handler)
+
+    def test_patched_cache_multiple_operations(self, mock_handler):
+        """Test that multiple cache operations trigger multiple signals."""
+        get_config.cache_clear()
+
+        patch_cache()
+        observe_cache_operation.connect(mock_handler)
+
+        cache = LocMemCache("test", {"LOCATION": "test"})
+
+        cache.set("key1", "value1")
+        cache.get("key1")
+        cache.delete("key1")
+
+        assert mock_handler.call_count == 3
+
+        calls = [call.kwargs["function_name"] for call in mock_handler.call_args_list]
+        assert "set" in calls
+        assert "get" in calls
+        assert "delete" in calls
+
+        observe_cache_operation.disconnect(mock_handler)
+
+
+class TestPatchCacheWithDisabledObserving:
+    """Test patched cache with observing disabled."""
+
+    def test_patched_cache_works_when_disabled(self, settings):
+        """Test that patched cache still works when observing is disabled."""
+        settings.OBSERVING = {"enabled": False}
+        get_config.cache_clear()
+
+        patch_cache()
+
+        cache = LocMemCache("test", {"LOCATION": "test"})
+
+        cache.set("key", "value")
+        result = cache.get("key")
+        assert result == "value"
+
+    def test_patched_cache_no_signal_when_disabled(self, settings, mock_handler):
+        """Test that patched cache doesn't send signals when disabled."""
+        settings.OBSERVING = {"enabled": False}
+        get_config.cache_clear()
+
+        patch_cache()
+        observe_cache_operation.connect(mock_handler)
+
+        cache = LocMemCache("test", {"LOCATION": "test"})
+        cache.set("key", "value")
+
+        mock_handler.assert_not_called()
+
+        observe_cache_operation.disconnect(mock_handler)

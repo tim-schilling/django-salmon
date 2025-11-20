@@ -1,0 +1,8 @@
+{% extends "example_page.html" %}
+{% load cache %}
+
+{% block content %}
+  {% cache 3 header %}
+    <h1>Cached template fragments</h1>
+  {% endcache %}
+{% endblock content %}

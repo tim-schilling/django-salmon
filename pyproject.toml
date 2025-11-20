@@ -1,0 +1,156 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling" ]
+
+[project]
+name = "django-observe"
+version = "0.1.0"
+description = "A Django third-party package that allows observing Django functionality via signals."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Tim Schilling", email = "schillingt@better-simple.com" },
+]
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: Django",
+  "Framework :: Django :: 4.2",
+  "Framework :: Django :: 5.0",
+  "Framework :: Django :: 5.1",
+  "Framework :: Django :: 5.2",
+  "Framework :: Django :: 6.0",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "django>=4.2",
+]
+
+urls.Homepage = "https://github.com/tim-schilling/django-observe"
+urls.Repository = "https://github.com/tim-schilling/django-observe"
+
+[dependency-groups]
+test = [
+  "coverage[toml]",
+  "parameterized",
+  "pytest",
+  "pytest-django",
+  "pytest-flake8-path",
+  "pytest-randomly",
+  "tox",
+  "tox-uv",
+  "typing-extensions",
+]
+
+django42 = [ "django>=4.2a1,<5; python_version>='3.8'" ]
+django50 = [ "django>=5a1,<5.1; python_version>='3.10'" ]
+django51 = [ "django>=5.1a1,<5.2; python_version>='3.10'" ]
+django52 = [ "django>=5.2a1,<6; python_version>='3.10'" ]
+django60 = [ "django>=6a1,<6.1; python_version>='3.12'" ]
+
+[tool.hatch.build.targets.wheel]
+packages = [ "src/django_observe" ]
+
+[tool.uv]
+conflicts = [
+  [
+    { group = "django42" },
+    { group = "django50" },
+    { group = "django51" },
+    { group = "django52" },
+    { group = "django60" },
+  ],
+]
+
+[tool.ruff]
+lint.select = [
+  # flake8-bugbear
+  "B",
+  # flake8-comprehensions
+  "C4",
+  # pycodestyle
+  "E",
+  # Pyflakes errors
+  "F",
+  # isort
+  "I",
+  # flake8-simplify
+  "SIM",
+  # flake8-tidy-imports
+  "TID",
+  # pyupgrade
+  "UP",
+  # Pyflakes warnings
+  "W",
+]
+lint.ignore = [
+  # flake8-bugbear opinionated rules
+  "B9",
+  # line-too-long
+  "E501",
+  # suppressible-exception
+  "SIM105",
+  # if-else-block-instead-of-if-exp
+  "SIM108",
+]
+lint.extend-safe-fixes = [
+  # non-pep585-annotation
+  "UP006",
+]
+lint.isort.required-imports = [ "from __future__ import annotations" ]
+
+[tool.pyproject-fmt]
+max_supported_python = "3.14"
+
+[tool.pytest.ini_options]
+addopts = """\
+    --strict-config
+    --strict-markers
+    --ds=tests.settings
+    """
+django_find_project = false
+xfail_strict = true
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = [
+  "django_observe",
+  "tests",
+]
+
+[tool.coverage.paths]
+source = [
+  "src",
+  ".tox/**/site-packages",
+]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.mypy]
+enable_error_code = [
+  "ignore-without-code",
+  "redundant-expr",
+  "truthy-bool",
+]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+mypy_path = "src/"
+namespace_packages = false
+no_implicit_optional = true
+warn_unreachable = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+allow_untyped_defs = true
