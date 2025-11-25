@@ -1,5 +1,3 @@
-from tests.settings import INSTALLED_APPS
-
 # Django Observe
 
 _A standardized way to observe Django's internals._
