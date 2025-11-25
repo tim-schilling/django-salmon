@@ -3,7 +3,8 @@
     "allow": [
       "Bash(pre-commit run:*)",
       "Bash(uv run tox:*)",
-      "Bash(uv run coverage:*)"
+      "Bash(uv run coverage:*)",
+      "Bash(uvx zizmor:*)"
     ],
     "deny": [],
     "ask": []
