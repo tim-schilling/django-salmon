@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 import pytest
 from django.dispatch import Signal
 
-from django_observe.config import get_config
-from django_observe.decorators import (
+from django_salmon.config import get_config
+from django_salmon.decorators import (
     observe,
     observe_context,
     observe_lock,

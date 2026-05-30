@@ -1,1 +1,1 @@
-"""Example Django project for testing django-observe."""
+"""Example Django project for testing django-salmon."""

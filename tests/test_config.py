@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from django_observe.config import CONFIG_DEFAULTS, get_config
-from django_observe.decorators import should_observe, with_args, with_result
-from django_observe.registry import ObserveRegistry
+from django_salmon.config import CONFIG_DEFAULTS, get_config
+from django_salmon.decorators import should_observe, with_args, with_result
+from django_salmon.registry import ObserveRegistry
 
 
 class TestGetConfig:
@@ -61,11 +61,11 @@ class TestGetConfig:
 
         # Check for expected decorators
         expected_decorators = [
-            "django_observe.decorators.prevent_nested_observe",
-            "django_observe.decorators.with_args",
-            "django_observe.decorators.with_result",
-            "django_observe.decorators.with_stacktrace",
-            "django_observe.decorators.with_timing",
+            "django_salmon.decorators.prevent_nested_observe",
+            "django_salmon.decorators.with_args",
+            "django_salmon.decorators.with_result",
+            "django_salmon.decorators.with_stacktrace",
+            "django_salmon.decorators.with_timing",
         ]
 
         for expected in expected_decorators:
@@ -147,8 +147,8 @@ class TestConfigurationIntegration:
         """Test that registry uses config to get decorators from settings."""
         settings.OBSERVING = {
             "test_component": [
-                "django_observe.decorators.with_args",
-                "django_observe.decorators.with_result",
+                "django_salmon.decorators.with_args",
+                "django_salmon.decorators.with_result",
             ],
         }
         get_config.cache_clear()

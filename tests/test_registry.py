@@ -5,9 +5,9 @@ from typing import Any
 
 import pytest
 
-from django_observe.config import get_config
-from django_observe.decorators import with_args, with_result, with_timing
-from django_observe.registry import ObserveRegistry, registry
+from django_salmon.config import get_config
+from django_salmon.decorators import with_args, with_result, with_timing
+from django_salmon.registry import ObserveRegistry, registry
 
 
 @pytest.fixture
@@ -102,8 +102,8 @@ class TestObserveRegistry:
         settings.OBSERVING = {
             "enabled": True,
             "test_component": [
-                "django_observe.decorators.with_args",
-                "django_observe.decorators.with_result",
+                "django_salmon.decorators.with_args",
+                "django_salmon.decorators.with_result",
             ],
         }
 
@@ -118,7 +118,7 @@ class TestObserveRegistry:
         """Test that get_decorators combines settings and registry decorators."""
         settings.OBSERVING = {
             "enabled": True,
-            "cache": ["django_observe.decorators.with_args"],
+            "cache": ["django_salmon.decorators.with_args"],
         }
         get_config.cache_clear()
         test_registry.register("cache", mock_decorator)
@@ -251,8 +251,8 @@ class TestRegistryIntegration:
         settings.OBSERVING = {
             "enabled": True,
             "test_component": [
-                "django_observe.decorators.with_args",
-                "django_observe.decorators.with_result",
+                "django_salmon.decorators.with_args",
+                "django_salmon.decorators.with_result",
             ],
         }
         test_registry.register("test_component", with_timing)

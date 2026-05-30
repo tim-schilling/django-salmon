@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from django_observe import registry
-from django_observe.decorators import observe
-from django_observe.signals import observe_cache_operation
+from django_salmon import registry
+from django_salmon.decorators import observe
+from django_salmon.signals import observe_cache_operation
 
 
 def observe_cache(func: Callable[..., Any]) -> Callable[..., Any]:

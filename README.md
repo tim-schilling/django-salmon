@@ -1,4 +1,4 @@
-# Django Observe
+# Django Salmon
 
 _A standardized way to observe Django's internals._
 
@@ -10,7 +10,7 @@ Observability is critical feature of software development, but tends to be negle
 1. Install it as a dependency:
 
   ```bash
-  pip install django-observe
+  pip install django-salmon
   ```
 
 2. Add it to your ``INSTALLED_APPS``:
@@ -18,7 +18,7 @@ Observability is critical feature of software development, but tends to be negle
   ```python
   INSTALLED_APPS = [
       # ...
-      "django_observe",
+      "django_salmon",
       # ...
   ]
   ```
@@ -27,7 +27,7 @@ Observability is critical feature of software development, but tends to be negle
 
   ```python
   from django.dispatch import receiver
-  from django_observe.signals import observe_cache_operation
+  from django_salmon.signals import observe_cache_operation
 
 
   @receiver(observe_cache_operation)
@@ -39,38 +39,38 @@ Observability is critical feature of software development, but tends to be negle
 
 ### Configuration
 
-Django Observe supports customizing the decorators that are applied to Django functionality. For example, by default the following decorators are used on all cache operations:
+Django Salmon supports customizing the decorators that are applied to Django functionality. For example, by default the following decorators are used on all cache operations:
 
 ```python
 OBSERVING = {
     "cache": [
-        "django_observe.decorators.prevent_nested_observe",
-        "django_observe.decorators.with_args",
-        "django_observe.decorators.with_result",
-        "django_observe.decorators.with_stacktrace",
-        "django_observe.decorators.with_timing",
+        "django_salmon.decorators.prevent_nested_observe",
+        "django_salmon.decorators.with_args",
+        "django_salmon.decorators.with_result",
+        "django_salmon.decorators.with_stacktrace",
+        "django_salmon.decorators.with_timing",
     ],
 }
 ```
 
-Each of these decorators will measure a different facet and include it in the context for the ``django_observe.decorators.observe`` decorator. If you only need to measure the timing facet, use the following configuration:
+Each of these decorators will measure a different facet and include it in the context for the ``django_salmon.decorators.observe`` decorator. If you only need to measure the timing facet, use the following configuration:
 
 ```python
 OBSERVING = {
     "cache": [
-        "django_observe.decorators.prevent_nested_observe",
-        "django_observe.decorators.with_timing",
+        "django_salmon.decorators.prevent_nested_observe",
+        "django_salmon.decorators.with_timing",
     ],
 }
 ```
 
 ### Observing your own functions
 
-Django Observe supports you applying your own decorators explicitly or by using a registry and utilizing the ``OBSERVING`` configuration.
+Django Salmon supports you applying your own decorators explicitly or by using a registry and utilizing the ``OBSERVING`` configuration.
 
 ```python
 from django.dispatch import Signal
-from django_observe.decorators import observe, with_args
+from django_salmon.decorators import observe, with_args
 
 my_signal = Signal()
 
@@ -87,8 +87,8 @@ You can register your own stacked decorators to the registry as well:
 # settings.py
 OBSERVING = {
     "only_timing": [
-        "django_observe.decorators.prevent_nested_observe",
-        "django_observe.decorators.with_timing",
+        "django_salmon.decorators.prevent_nested_observe",
+        "django_salmon.decorators.with_timing",
     ],
 }
 
@@ -98,8 +98,8 @@ from django.dispatch import Signal
 my_signal = Signal()
 
 # observe.py / Or anything else you want to use
-from django_observe import registry
-from django_observe.decorators import observe
+from django_salmon import registry
+from django_salmon.decorators import observe
 from .signals import my_signal
 
 
@@ -128,7 +128,7 @@ An example is:
 ```python
 import functools
 from django.dispatch import receiver, Signal
-from django_observe.decorators import observe_context, observe
+from django_salmon.decorators import observe_context, observe
 
 
 def with_answer_to_everything(func):

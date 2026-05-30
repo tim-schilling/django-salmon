@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django.core.cache.backends.locmem import LocMemCache
 
-from django_observe.hacks import patch as hacks_patch
+from django_salmon.hacks import patch as hacks_patch
 
 
 class TestHacksInit:

@@ -5,7 +5,7 @@ from functools import partial
 from pprint import pprint
 from typing import Any
 
-from django_observe.signals import observe_cache_operation
+from django_salmon.signals import observe_cache_operation
 
 SIGNALS = [
     ("observe_cache_operation", observe_cache_operation),

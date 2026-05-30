@@ -5,7 +5,7 @@ from typing import Any
 
 from django.utils.module_loading import import_string
 
-from django_observe.config import get_config
+from django_salmon.config import get_config
 
 
 class ObserveRegistry:

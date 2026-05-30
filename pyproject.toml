@@ -3,9 +3,9 @@ build-backend = "hatchling.build"
 requires = [ "hatchling" ]
 
 [project]
-name = "django-observe"
+name = "django-salmon"
 version = "0.1.0"
-description = "A Django third-party package that allows observing Django functionality via signals."
+description = "A Django third-party package for observing Django functionality via signals."
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
@@ -33,8 +33,8 @@ dependencies = [
   "django>=4.2",
 ]
 
-urls.Homepage = "https://github.com/tim-schilling/django-observe"
-urls.Repository = "https://github.com/tim-schilling/django-observe"
+urls.Homepage = "https://github.com/tim-schilling/django-salmon"
+urls.Repository = "https://github.com/tim-schilling/django-salmon"
 
 [dependency-groups]
 test = [
@@ -57,7 +57,7 @@ django60 = [ "django>=6a1,<6.1; python_version>='3.12'" ]
 django61 = [ "django>=6.1a1,<6.2; python_version>='3.12'" ]
 
 [tool.hatch.build.targets.wheel]
-packages = [ "src/django_observe" ]
+packages = [ "src/django_salmon" ]
 
 [tool.uv]
 conflicts = [
@@ -124,7 +124,7 @@ xfail_strict = true
 branch = true
 parallel = true
 source = [
-  "django_observe",
+  "django_salmon",
   "tests",
 ]
 

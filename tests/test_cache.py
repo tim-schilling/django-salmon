@@ -5,9 +5,9 @@ from unittest.mock import MagicMock
 import pytest
 from django.dispatch import Signal
 
-from django_observe.cache import observe_cache
-from django_observe.config import get_config
-from django_observe.signals import observe_cache_operation
+from django_salmon.cache import observe_cache
+from django_salmon.config import get_config
+from django_salmon.signals import observe_cache_operation
 
 
 @pytest.fixture(autouse=True)
@@ -74,8 +74,8 @@ class TestObserveCacheDecorator:
         settings.OBSERVING = {
             "enabled": True,
             "cache": [
-                "django_observe.decorators.with_args",
-                "django_observe.decorators.with_result",
+                "django_salmon.decorators.with_args",
+                "django_salmon.decorators.with_result",
             ],
         }
         get_config.cache_clear()
@@ -133,7 +133,7 @@ class TestObserveCacheDecorator:
         """Test observe_cache with multiple arguments."""
         settings.OBSERVING = {
             "enabled": True,
-            "cache": ["django_observe.decorators.with_args"],
+            "cache": ["django_salmon.decorators.with_args"],
         }
         get_config.cache_clear()
 
@@ -153,7 +153,7 @@ class TestObserveCacheDecorator:
         """Test observe_cache with timing decorator."""
         settings.OBSERVING = {
             "enabled": True,
-            "cache": ["django_observe.decorators.with_timing"],
+            "cache": ["django_salmon.decorators.with_timing"],
         }
         get_config.cache_clear()
 
@@ -208,8 +208,8 @@ class TestObserveCacheIntegration:
         settings.OBSERVING = {
             "enabled": True,
             "cache": [
-                "django_observe.decorators.with_args",
-                "django_observe.decorators.with_result",
+                "django_salmon.decorators.with_args",
+                "django_salmon.decorators.with_result",
             ],
         }
         get_config.cache_clear()
@@ -237,7 +237,7 @@ class TestObserveCacheIntegration:
         """Test observe_cache on multiple cache methods."""
         settings.OBSERVING = {
             "enabled": True,
-            "cache": ["django_observe.decorators.with_args"],
+            "cache": ["django_salmon.decorators.with_args"],
         }
         get_config.cache_clear()
 

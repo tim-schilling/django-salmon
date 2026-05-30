@@ -16,9 +16,9 @@ from django.core.cache.backends.memcached import (
 )
 from django.core.cache.backends.redis import RedisCache
 
-from django_observe.cache import observe_cache_operation
-from django_observe.config import get_config
-from django_observe.hacks.cache import (
+from django_salmon.cache import observe_cache_operation
+from django_salmon.config import get_config
+from django_salmon.hacks.cache import (
     WRAPPED_CACHE_METHODS,
     discover_cache_classes,
     patch_cache,

@@ -10,7 +10,7 @@ from django.core.cache import CacheHandler, InvalidCacheBackendError
 from django.core.cache.backends.base import BaseCache
 from django.utils.module_loading import import_string
 
-from django_observe.cache import observe_cache
+from django_salmon.cache import observe_cache
 
 WRAPPED_CACHE_METHODS = [
     "add",

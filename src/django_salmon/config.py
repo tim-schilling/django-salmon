@@ -8,11 +8,11 @@ from django.conf import settings
 CONFIG_DEFAULTS = {
     "enabled": True,
     "cache": [
-        "django_observe.decorators.prevent_nested_observe",
-        "django_observe.decorators.with_args",
-        "django_observe.decorators.with_result",
-        "django_observe.decorators.with_stacktrace",
-        "django_observe.decorators.with_timing",
+        "django_salmon.decorators.prevent_nested_observe",
+        "django_salmon.decorators.with_args",
+        "django_salmon.decorators.with_result",
+        "django_salmon.decorators.with_stacktrace",
+        "django_salmon.decorators.with_timing",
     ],
 }
 

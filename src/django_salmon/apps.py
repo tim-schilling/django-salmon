@@ -4,13 +4,11 @@ from __future__ import annotations
 
 from django.apps import AppConfig
 
-from django_observe.hacks import patch
+from django_salmon.hacks import patch
 
 
-class DjangoObserveConfig(AppConfig):
-    """Configuration for django_observe."""
-
-    name = "django_observe"
+class DjangoSalmonConfig(AppConfig):
+    name = "django_salmon"
 
     def ready(self) -> None:
         patch()

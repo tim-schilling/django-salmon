@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "testapp",
-    "django_observe",
+    "django_salmon",
 ]
 
 MIDDLEWARE = [

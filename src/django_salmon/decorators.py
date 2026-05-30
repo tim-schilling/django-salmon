@@ -16,7 +16,7 @@ from typing import Any
 
 from django.dispatch import Signal
 
-from django_observe.config import get_config
+from django_salmon.config import get_config
 
 observe_lock = ContextVar("is_observing", default=False)
 observe_context: ContextVar[dict[str, Any] | None] = ContextVar(
