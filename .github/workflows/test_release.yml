@@ -1,0 +1,110 @@
+name: Test Python 🐍 distribution 📦 to TestPyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      iteration:
+        description: 'A unique iteration for the run. The tag will be suffixed with .devyyyymmdd<iteration>'
+        type: string
+        required: true
+        default: "0"
+  schedule:
+    # Run the second day of every month.
+    - cron: "10 3 2 * *"
+  push:
+    tags:
+      - '*'
+
+permissions: {}
+
+env:
+  # Change these for your project's URLs
+  PYPI_TEST_URL: https://test.pypi.org/p/django-salmon
+  # The environment key that overrides the version number
+  DEV_VERSION_ENV_KEY: DJSALMON_VERSION_DEV
+
+jobs:
+  create-dev-version:
+    # Generate the dev version suffix based on the current date.
+    # Tag name:
+    #   <version>.dev<yyyymmdd><iteration>
+    name: Create dev version string
+    runs-on: ubuntu-latest
+    outputs:
+      dev_version: ${{ steps.output-dev-version.outputs.dev_version }}
+    steps:
+      - name: Set date suffix
+        id: set-date
+        run: echo "suffix=dev$(date +%Y%m%d)" >> $GITHUB_ENV
+      - name: Determine Iteration Value
+        id: set-iteration
+        # If the action is running on a schedule, default iteration to 0
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "iteration=${GITHUB_EVENT_INPUTS_ITERATION}" >> $GITHUB_ENV
+          else
+            echo "iteration=0" >> $GITHUB_ENV
+          fi
+        env:
+          GITHUB_EVENT_INPUTS_ITERATION: ${{ github.event.inputs.iteration }}
+      - name: Output dev version
+        id: output-dev-version
+        # Don't output a dev version if the push was for a tag.
+        run: |
+          if [[ "${{ startsWith(github.ref, 'refs/tags') }}" == "true" ]]; then
+            echo "dev_version=" >> "$GITHUB_OUTPUT"
+          else
+            echo "dev_version=${SUFFIX}${ITERATION}" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    name: Build distribution 📦
+    needs:
+    - create-dev-version
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      with:
+        persist-credentials: false
+    - name: Set up Python
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+      with:
+        python-version: "3.x"
+    - name: Install pypa/build
+      run:
+        python3 -m pip install build --user
+    - name: Build a binary wheel and a source tarball
+      env:
+        DEV_VERSION: ${{needs.create-dev-version.outputs.dev_version}}
+      run: ${{ env.DEV_VERSION_ENV_KEY }}="${DEV_VERSION}" python3 -m build
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  publish-to-testpypi:
+    name: Publish Python 🐍 distribution 📦 to TestPyPI
+    needs:
+    - build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: testpypi
+      url: ${{ env.PYPI_TEST_URL }}
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution 📦 to TestPyPI
+      uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b  # v1.14.0
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        skip-existing: true
